@@ -58,3 +58,127 @@ regular expression:
 
 That is, a letter followed by zero, or more, letters, underscores, dashes, or
 digits followed by a period followed by one or more letters or digits.
+
+### 4.2.5 File naming guidelines for modules
+
+Below sections are the file naming guidelines for EDK II meta files and source files.
+
+#### 4.2.5.1 EDK II meta files within a package
+
+```
+<PackageName>Pkg.dec
+<PackageName>Pkg.dsc
+
+   <PackageName> REQUIRED  *
+```
+
+#### 4.2.5.2 EDK II INF file within a Module instance
+* If the implementation supports >=2 or all CPU archs:
+```
+<ModuleName><Phase>.inf
+
+   <ModuleName>   REQUIRED    *
+   <Phase>        REQUIRED    Base, Sec, Pei, Dxe, DxeRuntime, Mm, StandaloneMm,
+                              Smm, Uefi.
+
+Example:
+   CpuIo2Dxe.inf
+```
+
+* If the implementation of CPU arch or vendor shares some code in the module. Or the implementation is only for the specific CPU arch or vendor.
+```
+<ModuleName><Phase><CpuArch><Vendor>.inf
+
+   <ModuleName>   REQUIRED    *
+   <Phase>        REQUIRED    Base, Sec, Pei, Dxe, DxeRuntime, Mm,
+                              StandaloneMm, Smm, Uefi.
+   <CpuArch>      OPTIONAL    Ia32, X64, Arm, AArch64, RiscV64, LoongArch64, Ebc, X86
+                              (X86 implies Ia32 and X64).
+   <Vendor>       OPTIONAL    *
+
+Example:
+   CpuIo2DxeAmd.inf
+```
+
+If the implementation does not have any shared code between phases. The module INF is located under \<Feature\>/\<Phase\> or \<Feature\>/<Phase\>/<CpuArch\>/<Vendor\> (see section 4.6 Directory Names).
+
+* If the implementation supports >=2 or all CPU archs:
+```
+<Feature>/<Phase>/<ModuleName>.inf
+
+   <Feature>      OPTIONAL    *
+   <Phase>        REQUIRED    Base, Sec, Pei, Dxe, DxeRuntime, Mm, StandaloneMm, Smm,
+                              Uefi.
+   <ModuleName>   REQUIRED    Same as <Feature>
+
+Example:
+   PCD/Dxe/Pcd.inf
+```
+
+* If the implementation of CPU arch or vendor shares some code in the module. Or the implementation is only for the specific CPU arch or vendor.
+```
+<Feature>/<Phase>/<ModuleName><CpuArch><Vendor>.inf
+
+   <Feature>      OPTIONAL    *
+   <Phase>        REQUIRED    Base, Sec, Pei, Dxe, DxeRuntime, Mm, StandaloneMm, Smm,
+                              Uefi.
+   <CpuArch>      OPTIONAL    Ia32, X64, Arm, AArch64, RiscV64, LoongArch64, Ebc, X86
+                              (X86 implies Ia32 and X64).
+   <Vendor>       OPTIONAL    *
+   <ModuleName>   REQUIRED    Same as <Feature>
+
+```
+#### 4.2.5.3 EDK II INF file within a Library instance
+```
+<Phase><CpuArch><Vendor><LibraryClassName><Dependency>.inf
+   <Phase>              REQUIRED     Base, Sec, Pei, Dxe, DxeRuntime, Mm,
+                                     StandaloneMm, Smm, Uefi.
+   <CpuArch>            OPTIONAL     Ia32, X64, Arm, AArch64, RiscV64, LoongArch64,
+                                     Ebc, X86 (X86 implies Ia32 and X64).
+   <Vendor>             OPTIONAL     *
+   <LibraryClassName>   REQUIRED     *
+   <Dependency>         OPTIONAL     * (Typically name of PPI, Protocol, LibraryClass
+                                       that the implementation is layered on top of)
+
+Example:
+   SmmAmdSmmCpuFeaturesLib.inf
+   SmmIntelSmmCpuFeaturesLib.inf
+```
+
+#### 4.2.5.4 EDK II source files within a Library/Module instance
+
+```
+<FileName>.c
+<FileName>.h
+<CpuArch><Vendor><FileName>.c
+<CpuArch><Vendor><FileName>.h
+<CpuArch>/<FileName>.c
+<CpuArch>/<FileName>.h
+<CpuArch>/<FileName>.nasm
+<CpuArch>/<FileName>.S
+<CpuArch>/<Vendor>/<FileName>.c
+<CpuArch>/<Vendor>/<FileName>.h
+<CpuArch>/<Vendor>/<FileName>.nasm
+<CpuArch>/<Vendor>/<FileName>.S
+
+   <CpuArch> OPTIONAL   Ia32, X64, Arm, AArch64, RiscV64, LoongArch64, Ebc, X86
+                        (X86 implies Ia32 and X64).
+   <Vendor>  OPTIONAL   *
+
+Example:
+   IA32/SmiException.nasm
+   X64/SmiException.nasm
+   SmmCpuFeatureLib.c
+   SmmCpuFeatureLibCommon.c
+   IntelSmmCpuFeaturesLib.c
+   AmdSmmCpuFeaturesLib.c
+
+   Or,
+   X86/IA32/SmiException.nasm
+   X86/X64/SmiException.nasm
+   X86/IntelSmmCpuFeaturesLib.c
+   X86/AmdSmmCpuFeaturesLib.c
+   RiscV64/JustAnExampleLib.c
+   SmmCpuFeatureLib.c
+   SmmCpuFeatureLibCommon.c
+```
